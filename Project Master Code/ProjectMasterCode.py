@@ -85,6 +85,7 @@ try:
             if scd4x.temperature > 23 or scd4x.relative_humidity > 70 or scd4x.CO2 > 900:
                 blink_led(num_times=2, delay=0.7)
                 print("LED blink sent")
+                print("ventilate room...")
                 set_servo_angle(90)
             else:
                 set_servo_angle(0)
