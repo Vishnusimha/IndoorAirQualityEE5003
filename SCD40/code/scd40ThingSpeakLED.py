@@ -31,10 +31,10 @@ def sendDataToCloud(CO2, temperature, humidity, current_time):
     # Creating payload with data and API key
     payload = {
         "api_key": API_KEY,
-        "field1": temperature,
-        "field2": humidity,
-        "field3": CO2,
-        "field4": current_time
+        "field1": current_time,
+        "field2": temperature,
+        "field3": humidity,
+        "field4": CO2
     }
 
     # Sending HTTP POST type request to ThingSpeak
