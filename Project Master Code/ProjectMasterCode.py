@@ -3,7 +3,10 @@ import board
 import adafruit_scd4x
 import requests
 import RPi.GPIO as GPIO
+import csv
+import os
 
+# scd40ThingSpeakLEDServoCSV
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
 
@@ -28,6 +31,45 @@ print("Measuring CO2, Temperature and Humidity Values....")
 # ThingSpeak endpoint and API KEY
 API_ENDPOINT = "https://api.thingspeak.com/update"
 API_KEY = "9MB5PUUHD6AKTA8Z"
+
+# CSV file path
+CSV_FILE_PATH = "testdata.csv"
+
+# creating a CSV file if it not exists in that path
+
+
+def create_csv_file():
+    with open(CSV_FILE_PATH, 'w', newline='') as csvfile:
+        writer = csv.writer(csvfile)
+        writer.writerow(["created_at", "entry_id", "field1",
+                        "field2", "field3", "field4"])
+
+
+def get_next_entry_id():
+    with open(CSV_FILE_PATH, 'r') as csvfile:
+        reader = csv.reader(csvfile)
+        # Reading the contents of the file into a list
+        rows = list(reader)
+        # Extract existing entry_ids from CSV file
+        entry_ids = [int(row[1]) for row in rows if row[1].isdigit()]
+        if entry_ids:
+            return max(entry_ids) + 1
+        else:
+            return 1
+
+# Function to save data into  a CSV file
+
+
+def save_data_to_csv(created_at, temperature, humidity, co2):
+    entry_id = get_next_entry_id()
+    with open(CSV_FILE_PATH, 'a', newline='') as csvfile:
+        writer = csv.writer(csvfile)
+        # Add column headings if the file is empty
+        if csvfile.tell() == 0:
+            writer.writerow(["created_at", "entry_id",
+                            "field1", "field2", "field3", "field4"])
+        writer.writerow([created_at, entry_id, created_at,
+                        temperature, humidity, co2])
 
 
 def sendDataToCloud(CO2, temperature, humidity, current_time):
@@ -68,18 +110,24 @@ def set_servo_angle(angle):
     time.sleep(0.3)
 
 
+# Checking if the CSV file exists, if not, This will create one
+if not os.path.exists(CSV_FILE_PATH):
+    create_csv_file()
+
 try:
     # Start the PWM signal with 0 (servo at 0 degrees)
     servo_pwm.start(0)
     while True:
         if scd4x.data_ready:
             t = time.localtime()
-            current_time = time.strftime("%H:%M:%S", t)
+            current_time = time.strftime("%Y-%m-%dT%H:%M:%S%z", t)
             print("current time %s " % current_time)
             print("CO2: %d ppm" % scd4x.CO2)
             print("Temperature: %0.1f *C" % scd4x.temperature)
             print("Humidity: %0.1f %%" % scd4x.relative_humidity)
             print()
+            save_data_to_csv(current_time, scd4x.temperature,
+                             scd4x.relative_humidity, scd4x.CO2)
             sendDataToCloud(scd4x.CO2, scd4x.temperature,
                             scd4x.relative_humidity, current_time)
             if scd4x.temperature > 23 or scd4x.relative_humidity > 70 or scd4x.CO2 > 900:
