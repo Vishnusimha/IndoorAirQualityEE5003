@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import time
 import os
 
-current_directory = os.getcwd()
+current_directory = os.path.dirname(os.path.abspath(__file__))
 print(current_directory)
 # Reading the CSV file
 data = pd.read_csv(f'{current_directory}/feeds.csv')

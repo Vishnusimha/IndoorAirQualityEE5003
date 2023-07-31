@@ -4,7 +4,7 @@ import time
 import os
 # Raspberry code to generate hourly reports 
 # Reading the CSV file
-current_directory = os.getcwd()
+current_directory = os.path.dirname(os.path.abspath(__file__))
 
 data = pd.read_csv(f'{current_directory}/feeds.csv')
 
