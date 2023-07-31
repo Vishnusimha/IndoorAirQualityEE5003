@@ -6,40 +6,54 @@ import RPi.GPIO as GPIO
 import csv
 import os
 
+# Setting GPIO
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
 
-# Servo motor
+# Constants
 servo_pin = 22
 pwm_frequency = 50
-GPIO.setup(servo_pin, GPIO.OUT)
-servo_pwm = GPIO.PWM(servo_pin, pwm_frequency)
-
-# LED
 led_pin = 27
-GPIO.setup(led_pin, GPIO.OUT)
-
-# SCD40
-i2c = board.I2C()
-scd4x = adafruit_scd4x.SCD4X(i2c)
-print("SCD40 Sensor Serial no:", [hex(i) for i in scd4x.serial_number])
-# Starting Low periodic measurement.
-scd4x.start_low_periodic_measurement()
-print("Measuring CO2, Temperature and Humidity Values....")
 
 # ThingSpeak endpoint and API KEY
 API_ENDPOINT = "https://api.thingspeak.com/update"
 API_KEY = "9MB5PUUHD6AKTA8Z"
 
-# CSV file path
-CSV_FILE_PATH = "testdata.csv"
+# Servo motor initialisation
+GPIO.setup(servo_pin, GPIO.OUT)
+servo_pwm = GPIO.PWM(servo_pin, pwm_frequency)
 
-#creating a CSV file if it not exists in that path
+# LED initialisation
+GPIO.setup(led_pin, GPIO.OUT)
+
+# SCD40 initialisation
+i2c = board.I2C()
+scd4x = adafruit_scd4x.SCD4X(i2c)
+print("SCD40 Sensor Serial no:", [hex(i) for i in scd4x.serial_number])
+
+# Starting Low periodic measurement.
+scd4x.start_low_periodic_measurement()
+print("Measuring CO2, Temperature and Humidity Values....")
+
+# Getting current directory path
+current_directory = os.path.dirname(os.path.abspath(__file__))
+# Getting parent directory path
+parent_directory = os.path.dirname(current_directory)
+grandparent_directory = os.path.dirname(parent_directory)
+print(current_directory)
+
+# CSV file path
+CSV_FILE_PATH = f"{grandparent_directory}/Reportsgeneration/sensordata.csv"
+print(f"Data saving to Directory -> {CSV_FILE_PATH}")
+# creating a CSV file if it not exists in that path
+
+
 def create_csv_file():
     with open(CSV_FILE_PATH, 'w', newline='') as csvfile:
         writer = csv.writer(csvfile)
         writer.writerow(["created_at", "entry_id", "field1",
                         "field2", "field3", "field4"])
+
 
 def get_next_entry_id():
     with open(CSV_FILE_PATH, 'r') as csvfile:
@@ -53,8 +67,9 @@ def get_next_entry_id():
         else:
             return 1
 
-# Function to save data into  a CSV file
+
 def save_data_to_csv(created_at, temperature, humidity, co2):
+    # Function to save data into  a CSV file
     entry_id = get_next_entry_id()
     with open(CSV_FILE_PATH, 'a', newline='') as csvfile:
         writer = csv.writer(csvfile)
@@ -64,6 +79,7 @@ def save_data_to_csv(created_at, temperature, humidity, co2):
                             "field1", "field2", "field3", "field4"])
         writer.writerow([created_at, entry_id, created_at,
                         temperature, humidity, co2])
+
 
 def sendDataToCloud(CO2, temperature, humidity, current_time):
     print(CO2)
@@ -87,6 +103,7 @@ def sendDataToCloud(CO2, temperature, humidity, current_time):
     # Printing response status code
     print("Data sent to ThingSpeak Cloud. Status Code:", response.status_code)
 
+
 def blink_led(num_times, delay):
     print("LED blink intruction arrived")
     for _ in range(num_times):
@@ -94,6 +111,7 @@ def blink_led(num_times, delay):
         time.sleep(delay)
         GPIO.output(led_pin, GPIO.LOW)
         time.sleep(delay)
+
 
 def set_servo_angle(angle):
     duty_cycle = 2.5 + (angle / 18.0)
@@ -105,32 +123,38 @@ def set_servo_angle(angle):
 if not os.path.exists(CSV_FILE_PATH):
     create_csv_file()
 
-try:
-    # Start the PWM signal with 0 (servo at 0 degrees)
-    servo_pwm.start(0)
-    while True:
-        if scd4x.data_ready:
-            t = time.localtime()
-            current_time = time.strftime("%Y-%m-%dT%H:%M:%S%z", t)
-            print("current time %s " % current_time)
-            print("CO2: %d ppm" % scd4x.CO2)
-            print("Temperature: %0.1f *C" % scd4x.temperature)
-            print("Humidity: %0.1f %%" % scd4x.relative_humidity)
-            print()
-            save_data_to_csv(current_time, scd4x.temperature,
-                             scd4x.relative_humidity, scd4x.CO2)
-            sendDataToCloud(scd4x.CO2, scd4x.temperature,
-                            scd4x.relative_humidity, current_time)
-            if scd4x.temperature > 23 or scd4x.relative_humidity > 70 or scd4x.CO2 > 900:
-                blink_led(num_times=2, delay=0.7)
-                print("LED blink sent")
-                print("ventilate room...")
-                set_servo_angle(90)
-            else:
-                set_servo_angle(0)
-            print("sleeping...")
-            time.sleep(5)
 
-except KeyboardInterrupt:
-    servo_pwm.stop()
-    GPIO.cleanup()
+def main():
+    try:
+        # Start the PWM signal with 0 (servo at 0 degrees)
+        servo_pwm.start(0)
+        while True:
+            if scd4x.data_ready:
+                t = time.localtime()
+                current_time = time.strftime("%Y-%m-%dT%H:%M:%S%z", t)
+                print("current time %s " % current_time)
+                print("CO2: %d ppm" % scd4x.CO2)
+                print("Temperature: %0.1f *C" % scd4x.temperature)
+                print("Humidity: %0.1f %%" % scd4x.relative_humidity)
+                print()
+                save_data_to_csv(current_time, scd4x.temperature,
+                                 scd4x.relative_humidity, scd4x.CO2)
+                sendDataToCloud(scd4x.CO2, scd4x.temperature,
+                                scd4x.relative_humidity, current_time)
+                if scd4x.temperature > 23 or scd4x.relative_humidity > 70 or scd4x.CO2 > 900:
+                    blink_led(num_times=2, delay=0.7)
+                    print("LED blink sent")
+                    print("ventilate room...")
+                    set_servo_angle(90)
+                else:
+                    set_servo_angle(0)
+                print("sleeping...")
+                time.sleep(5)
+
+    except KeyboardInterrupt:
+        servo_pwm.stop()
+        GPIO.cleanup()
+
+
+if __name__ == "__main__":
+    main()
