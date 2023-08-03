@@ -10,8 +10,6 @@ import socketserver
 import threading
 import json
 
-# scd40ThingSpeakLEDServoCSVServerEmail code changes below.
-
 # Setting GPIO
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
@@ -139,47 +137,44 @@ if not os.path.exists(CSV_FILE_PATH):
 
 class CSVHandler(http.server.SimpleHTTPRequestHandler):
     def do_GET(self):
-        # Get the request path
+        # Geting the request path (endpoint)
         path = self.path
 
         if path == '/csv':
-            # If the request is for CSV data, handle it accordingly
+            # if requested is for CSV data
             self.send_response(200)
             self.send_header('Content-type', 'text/csv')
             self.end_headers()
 
-            # Specify the CSV file name located in the current directory
             csv_filename = "/home/vishnu/Downloads/IndoorAirQualityEE5003/Reportsgeneration/sensordata.csv"
-
-            # Read the CSV data from the file
+            # Reading CSV data
             with open(csv_filename, 'r') as file:
                 csv_data = file.read()
 
             self.wfile.write(bytes(csv_data, 'utf-8'))
 
         elif path == '/json':
-            # If the request is for JSON data, handle it accordingly
+            # If requested is for JSON data
             self.send_response(200)
             self.send_header('Content-type', 'application/json')
             self.end_headers()
 
-            # Specify the CSV file name located in the current directory
             csv_filename = "/home/vishnu/Downloads/IndoorAirQualityEE5003/Reportsgeneration/sensordata.csv"
 
-            # Read the CSV data from the file and convert it to a list of dictionaries
+            # Reading CSV data and converting it to a list of dictionaries
             csv_data = []
             with open(csv_filename, 'r') as file:
                 csv_reader = csv.DictReader(file)
                 for row in csv_reader:
                     csv_data.append(row)
 
-            # Convert the list of dictionaries to a JSON object
+            # Converting list of dictionaries to a JSON object
             json_data = json.dumps(csv_data)
 
             self.wfile.write(bytes(json_data, 'utf-8'))
 
         else:
-            # If the request path is not recognized, return a 404 error
+            # when the request path is not in options, returning 404 error
             self.send_response(404)
             self.end_headers()
             self.wfile.write(b'Error 404: Not Found. Request /csv or /json')
@@ -249,9 +244,9 @@ def main():
 
 
 if __name__ == "__main__":
-    # Create and start the server thread
+    # Created and starting server thread
     server_thread = threading.Thread(target=start_server)
-    # Setting the thread as daemon allows it to exit when the main thread exits
+    # Setting the thread as daemon this allows it to exit when the main thread exits
     server_thread.daemon = True
-    server_thread.start()
+    server_thread.start()  # Starting Thread
     main()
