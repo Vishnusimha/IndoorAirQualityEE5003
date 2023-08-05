@@ -63,7 +63,7 @@ def create_csv_file():
     with open(CSV_FILE_PATH, 'w', newline='') as csvfile:
         writer = csv.writer(csvfile)
         writer.writerow(["created_at", "entry_id", "field1",
-                        "field2", "field3", "field4"])
+                        "field2", "field3", "field4","field7"])
 
 
 def get_next_entry_id():
@@ -79,7 +79,7 @@ def get_next_entry_id():
             return 1
 
 
-def save_data_to_csv(created_at, temperature, humidity, co2):
+def save_data_to_csv(created_at, temperature, humidity, co2, isVentilationRequired):
     # Function to save data into  a CSV file
     entry_id = get_next_entry_id()
     with open(CSV_FILE_PATH, 'a', newline='') as csvfile:
@@ -87,25 +87,26 @@ def save_data_to_csv(created_at, temperature, humidity, co2):
         # Add column headings if the file is empty
         if csvfile.tell() == 0:
             writer.writerow(["created_at", "entry_id",
-                            "field1", "field2", "field3", "field4"])
+                            "field1", "field2", "field3", "field4", "field7"])
         writer.writerow([created_at, entry_id, created_at,
-                        temperature, humidity, co2])
+                        temperature, humidity, co2, isVentilationRequired])
 
 
-def sendDataToCloud(CO2, temperature, humidity, current_time):
+def sendDataToCloud(CO2, temperature, humidity, current_time, isVentilationRequired):
     print(f"Current time: {current_time}")
     print(f"CO2: {CO2} ppm")
     print(f"Temperature: {temperature:.1f} °C")
     print(f"Humidity: {humidity:.1f} %")
+    print(f"isVentilationRequired: {isVentilationRequired}")
     print()
-
     # Creating payload with data and API key
     payload = {
         "api_key": API_KEY,
         "field1": current_time,
         "field2": temperature,
         "field3": humidity,
-        "field4": CO2
+        "field4": CO2,
+        "field7": isVentilationRequired
     }
 
     # Sending HTTP POST type request to ThingSpeak
@@ -220,17 +221,19 @@ def main():
                 current_time = time.strftime("%Y-%m-%dT%H:%M:%S%z", t)
                 print("Got readings")
                 print()
-                save_data_to_csv(current_time, scd4x.temperature,
-                                 scd4x.relative_humidity, scd4x.CO2)
-                sendDataToCloud(scd4x.CO2, scd4x.temperature,
-                                scd4x.relative_humidity, current_time)
+                isVentilationRequired = False
                 if scd4x.temperature > temperatureThresholdForVentilation or scd4x.relative_humidity > humidityThresholdForVentilation or scd4x.CO2 > co2ThresholdForVentilation:
                     blink_led(num_times=2, delay=0.7)
                     print("Ventilating...")
-                    set_servo_angle(90)
+                    isVentilationRequired = True
+                    # set_servo_angle(90)
                 else:
-                    set_servo_angle(0)
-
+                    # set_servo_angle(0)
+                    print()
+                save_data_to_csv(current_time, scd4x.temperature,
+                                 scd4x.relative_humidity, scd4x.CO2, isVentilationRequired)
+                sendDataToCloud(scd4x.CO2, scd4x.temperature,
+                                scd4x.relative_humidity, current_time, isVentilationRequired)
                 if scd4x.temperature > temperatureThresholdForEmail or scd4x.CO2 > co2ThresholdForEmail:
                     sendEmailAlert(current_time, scd4x.CO2,
                                    scd4x.temperature, scd4x.relative_humidity)

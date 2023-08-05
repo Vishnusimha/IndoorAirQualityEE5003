@@ -1,0 +1,9 @@
+Threshold values followed for this data
+
+# configurable values
+temperatureThresholdForEmail = 22
+co2ThresholdForEmail = 1000
+
+temperatureThresholdForVentilation = 25
+co2ThresholdForVentilation = 1000
+humidityThresholdForVentilation = 70
