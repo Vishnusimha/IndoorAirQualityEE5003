@@ -223,6 +223,10 @@ fun Scd40Screen(viewModel: Scd40ViewModel) {
             Column(modifier = Modifier.padding(8.dp)) {
                 scd40FullJsonRPIDataState.value?.let { scd40FullJsonRPIDataState ->
                     // Displaying the JSON data in a RecyclerView
+                    Text(
+                        text = "RPI full Json Data",
+                        style = MaterialTheme.typography.labelSmall
+                    )
                     LazyColumn {
                         // Parsing JSON data into a list of SensorData objects
                         val sensorDataList = parseSensorDataList(scd40FullJsonRPIDataState)
@@ -240,6 +244,10 @@ fun Scd40Screen(viewModel: Scd40ViewModel) {
             Column(modifier = Modifier.padding(0.dp)) {
                 scd40FullJsonThingSpeakCloudDataState.value?.let { scd40FullJsonThingSpeakCloudDataState ->
                     // Displaying the JSON data in a RecyclerView
+                    Text(
+                        text = "ThingSpeak full json data",
+                        style = MaterialTheme.typography.labelSmall
+                    )
                     LazyColumn {
                         // Parsing the JSON data into a list of SensorData objects
                         val sensorDataList =
@@ -247,7 +255,7 @@ fun Scd40Screen(viewModel: Scd40ViewModel) {
 
                         items(sensorDataList.reversed()) { sensorData ->
                             SensorDataRow(sensorData, PurpleGrey80)
-//                            Divider() //
+                            // Divider()
                         }
                     }
                 }
@@ -255,7 +263,3 @@ fun Scd40Screen(viewModel: Scd40ViewModel) {
         }
     }
 }
-
-
-
-
