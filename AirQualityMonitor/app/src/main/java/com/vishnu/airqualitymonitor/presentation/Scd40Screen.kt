@@ -1,5 +1,6 @@
 package com.vishnu.airqualitymonitor.presentation
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -66,6 +67,9 @@ fun Scd40Screen(viewModel: Scd40ViewModel) {
                     Text(text = "Temperature DHT11: ${sensorData.field5}")
                     Text(text = "Humidity DHT11: ${sensorData.field5}")
                 }
+                if(sensorData.field7 != "null"){
+                    Text(text = "Was Ventilation required ? : ${sensorData.field7}")
+                }
             }
         }
 
@@ -79,16 +83,33 @@ fun Scd40Screen(viewModel: Scd40ViewModel) {
             val jsonArray = JSONArray(jsonData)
             for (i in 0 until jsonArray.length()) {
                 val jsonObject = jsonArray.getJSONObject(i)
-                val sensorData = SensorData(
-                    createdAt = jsonObject.getString("created_at"),
-                    entryId = jsonObject.getString("entry_id"),
-                    field1 = jsonObject.getString("field1"),
-                    field2 = jsonObject.getString("field2"),
-                    field3 = jsonObject.getString("field3"),
-                    field4 = jsonObject.getString("field4"),
-                    field5 = jsonObject.getString("field5"),
-                    field6 = jsonObject.getString("field6")
-                )
+                var sensorData = SensorData("null","null","null","null","null","null","null","null","null")
+                if(jsonObject.has("field5") && jsonObject.has("field6") && jsonObject.has("field7")){
+                    Log.i("HELLO", "EMPTYYYyyyyy")
+                  sensorData = SensorData(
+                        createdAt = jsonObject.getString("created_at"),
+                        entryId = jsonObject.getString("entry_id"),
+                        field1 = jsonObject.getString("field1"),
+                        field2 = jsonObject.getString("field2"),
+                        field3 = jsonObject.getString("field3"),
+                        field4 = jsonObject.getString("field4"),
+                        field5 = jsonObject.getString("field5"),
+                        field6 = jsonObject.getString("field6"),
+                        field7 = jsonObject.getString("field7"),
+                    )
+                } else if(jsonObject.has("field7")){
+                    sensorData = SensorData(
+                        createdAt = jsonObject.getString("created_at"),
+                        entryId = jsonObject.getString("entry_id"),
+                        field1 = jsonObject.getString("field1"),
+                        field2 = jsonObject.getString("field2"),
+                        field3 = jsonObject.getString("field3"),
+                        field4 = jsonObject.getString("field4"),
+                        field5 = "null",
+                        field6 = "null",
+                        field7 = jsonObject.getString("field7"),
+                    )
+                }
                 sensorDataList.add(sensorData)
             }
         } catch (e: Exception) {
