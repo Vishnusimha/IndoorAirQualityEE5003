@@ -16,3 +16,5 @@ humidityThresholdForVentilation = 45
 
 
 When the code was executed, screenshots were taken, including logs printed in console and the weather application, to showcase how accurately the sensor measures data within an outdoor environment when properly ventilated.
+
+While collecting this sensor data, there was ThingSpeak cloud platform down time, so only few entries of data was happened. Now adding that CSV here.
