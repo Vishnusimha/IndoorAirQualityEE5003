@@ -6,6 +6,10 @@ import RPi.GPIO as GPIO
 import csv
 import os
 import dht11
+import http.server
+import socketserver
+import threading
+import json
 
 # Setting GPIO
 GPIO.setmode(GPIO.BCM)
@@ -34,7 +38,7 @@ scd4x = adafruit_scd4x.SCD4X(i2c)
 print("SCD40 Sensor Serial no:", [hex(i) for i in scd4x.serial_number])
 
 # Starting Low periodic measurement.
-scd4x.start_low_periodic_measurement()
+scd4x.start_periodic_measurement()
 print("Measuring CO2, Temperature and Humidity Values....")
 
 # Getting current directory path
@@ -132,7 +136,7 @@ if not os.path.exists(CSV_FILE_PATH):
 def main():
     try:
         # Start the PWM signal with 0 (servo at 0 degrees)
-        servo_pwm.start(0)
+        # servo_pwm.start(0)
         dht_values = []
         while True:
             dhtResult = myDHT.read()
@@ -142,16 +146,16 @@ def main():
                 dht_values.append((dht_temperature, dht_humidity))
                 # Keep only the last 5 values in the list (or any desired number)
                 dht_values = dht_values[-5:]
-                print(
-                    f"DHT-Temperature: {dhtResult.temperature} °C , DHT-Humidity: {dhtResult.humidity} % ")
+                # print(
+                #     f"DHT-Temperature: {dhtResult.temperature} °C , DHT-Humidity: {dhtResult.humidity} % ")
             if scd4x.data_ready:
                 t = time.localtime()
                 current_time = time.strftime("%Y-%m-%dT%H:%M:%S%z", t)
-                print(f"Current time: {current_time}")
-                print(f"CO2: {scd4x.CO2} ppm")
-                print(f"Temperature: {scd4x.temperature:.1f} °C")
-                print(f"Humidity: {scd4x.relative_humidity:.1f} %")
-                print()
+                # print(f"Current time: {current_time}")
+                # print(f"CO2: {scd4x.CO2} ppm")
+                # print(f"Temperature: {scd4x.temperature:.1f} °C")
+                # print(f"Humidity: {scd4x.relative_humidity:.1f} %")
+                # print()
                 if dht_values:
                     recent_dht_temperature, recent_dht_humidity = dht_values[-1]
                 else:
@@ -163,11 +167,12 @@ def main():
                                 scd4x.relative_humidity, current_time, recent_dht_temperature, recent_dht_humidity)
                 if scd4x.temperature > 23 or scd4x.relative_humidity > 70 or scd4x.CO2 > 900:
                     blink_led(num_times=2, delay=0.7)
-                    print("LED blink sent")
+                    # print("LED blink sent")
                     print("ventilate room...")
-                    set_servo_angle(90)
+                    # set_servo_angle(90)
                 else:
-                    set_servo_angle(0)
+                    # set_servo_angle(0)
+                    print()
                 print("sleeping...")
                 time.sleep(5)
 
@@ -176,5 +181,60 @@ def main():
         GPIO.cleanup()
 
 
+class CSVHandler(http.server.SimpleHTTPRequestHandler):
+    def do_GET(self):
+        # Geting the request path (endpoint)
+        path = self.path
+
+        if path == '/csv':
+            # if requested is for CSV data
+            self.send_response(200)
+            self.send_header('Content-type', 'text/csv')
+            self.end_headers()
+
+            csv_filename = "/home/vishnu/Downloads/IndoorAirQualityEE5003/Reportsgeneration/sensordata.csv"
+            # Reading CSV data
+            with open(csv_filename, 'r') as file:
+                csv_data = file.read()
+
+            self.wfile.write(bytes(csv_data, 'utf-8'))
+
+        elif path == '/json':
+            # If requested is for JSON data
+            self.send_response(200)
+            self.send_header('Content-type', 'application/json')
+            self.end_headers()
+
+            csv_filename = "/home/vishnu/Downloads/IndoorAirQualityEE5003/Reportsgeneration/sensordata.csv"
+
+            # Reading CSV data and converting it to a list of dictionaries
+            csv_data = []
+            with open(csv_filename, 'r') as file:
+                csv_reader = csv.DictReader(file)
+                for row in csv_reader:
+                    csv_data.append(row)
+
+            # Converting list of dictionaries to a JSON object
+            json_data = json.dumps(csv_data)
+
+            self.wfile.write(bytes(json_data, 'utf-8'))
+
+        else:
+            # when the request path is not in options, returning 404 error
+            self.send_response(404)
+            self.end_headers()
+            self.wfile.write(b'Error 404: Not Found. Request /csv or /json')
+
+
+def start_server():
+    address = ('192.168.1.43', 8000)
+    server = socketserver.TCPServer(address, CSVHandler)
+
+    print(f'Server running on http://{address[0]}:{address[1]}/')
+    server.serve_forever()
+
 if __name__ == "__main__":
+    server_thread = threading.Thread(target=start_server)
+    server_thread.daemon = True
+    server_thread.start()
     main()
