@@ -6,7 +6,7 @@ import os
 current_directory = os.path.dirname(os.path.abspath(__file__))
 print(current_directory)
 # Reading the CSV file
-data = pd.read_csv(f'{current_directory}/datadht11.csv')
+data = pd.read_csv(f'{current_directory}/sensordata.csv')
 
 # Converting the 'created_at' and 'field1' columns to datetime format
 data['created_at'] = pd.to_datetime(data['created_at'])
@@ -108,7 +108,7 @@ def saveAllTogether():
 
     plt.xlabel('Time', fontsize=20)
     plt.ylabel('Value', fontsize=20)
-    plt.title('CO2, Temperature, and Humidity Data Trends', fontsize=20)
+    plt.title('CO2, Temperature, and Humidity Data Trends with Ventilation Marks', fontsize=20)
     plt.grid(True)
     plt.legend()
     setLabelSize(20)

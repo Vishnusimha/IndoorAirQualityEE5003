@@ -6,7 +6,7 @@ import os
 # Reading the CSV file
 current_directory = os.path.dirname(os.path.abspath(__file__))
 
-data = pd.read_csv(f'{current_directory}/datadht11.csv')
+data = pd.read_csv(f'{current_directory}/sensordata.csv')
 
 # Converting the 'created_at' and 'field1' columns to datetime format
 data['created_at'] = pd.to_datetime(data['created_at'])
