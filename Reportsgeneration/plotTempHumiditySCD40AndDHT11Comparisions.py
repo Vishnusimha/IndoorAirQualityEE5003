@@ -102,7 +102,7 @@ def saveTempAndDHTTempTogether():
     plt.grid(True)
     plt.legend()
     setLabelSize(20)
-    setTicksSize(14)
+    setTicksSize(18)
     plt.tight_layout()
 
     # Saving the plot as a photo
@@ -128,7 +128,7 @@ def saveHumidityAndDHTHumidityTogether():
     plt.grid(True)
     plt.legend()
     setLabelSize(20)
-    setTicksSize(14)
+    setTicksSize(18)
     plt.tight_layout()
 
     # Saving the plot as a photo
@@ -159,7 +159,7 @@ def saveSCD40AndDHTTogetherWithOutMeanSampling():
     plt.grid(True)
     plt.legend()
     setLabelSize(20)
-    setTicksSize(14)
+    setTicksSize(18)
     plt.tight_layout()
     # plt.show()
     plt.savefig(

@@ -69,7 +69,7 @@ def saveCO2andTemperatureHumiditySeparately():
     plt.grid(True)
     plt.legend()
     setLabelSize(20)
-    setTicksSize(14)
+    setTicksSize(18)
     plt.tight_layout()
 
   # Saving the plot as a photo
@@ -97,7 +97,7 @@ def saveAllTogether():
     plt.grid(True)
     plt.legend()
     setLabelSize(20)
-    setTicksSize(14)
+    setTicksSize(18)
     plt.tight_layout()
 
     # Saving the plot as a photo
