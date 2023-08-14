@@ -9,7 +9,7 @@ print(current_directory)
 # Reading the CSV file
 
 data = pd.read_csv(
-    f'{current_directory}/datadht11.csv')
+    f'{current_directory}/sensordata.csv')
 
 data['field1'] = pd.to_datetime(data['field1'], format='%Y-%m-%dT%H:%M:%S%z')
 data.set_index('field1', inplace=True)
@@ -21,12 +21,22 @@ co2_means = data['field4'].resample('T').mean()
 temperature_dht_means = data['field5'].resample('T').mean()
 humidity_dht_means = data['field6'].resample('T').mean()
 
-
 # temperature_means = data['field2'].resample('2T').mean()
 # humidity_means = data['field3'].resample('2T').mean()
 # co2_means = data['field4'].resample('2T').mean()
 # temperature_dht_means = data['field5'].resample('2T').mean()
 # humidity_dht_means = data['field6'].resample('2T').mean()
+
+
+def setLabelSize(size):
+    for label in plt.legend().get_texts():
+        label.set_fontsize(size)
+
+
+def setTicksSize(size):
+    plt.xticks(fontsize=size)
+    plt.yticks(fontsize=size)
+
 
 def create_folder(base_folder_name):
     folder_name = f"{base_folder_name}_{getCurrentTime()}"
@@ -59,11 +69,13 @@ def saveSCD40AndDHTTogether():
     plt.plot(humidity_dht_means.index, humidity_dht_means,
              label='Humidity - DHT11', marker='o', color='lightblue')
 
-    plt.xlabel('Time')
-    plt.ylabel('Value')
-    plt.title('SCD40 and DHT11 Data')
+    plt.xlabel('Time', fontsize=20)
+    plt.ylabel('Value', fontsize=20)
+    plt.title('SCD40 and DHT11 Data', fontsize=20)
     plt.grid(True)
     plt.legend()
+    setLabelSize(20)
+    setTicksSize(14)
     plt.tight_layout()
     # plt.show()
 
@@ -84,11 +96,13 @@ def saveTempAndDHTTempTogether():
     plt.plot(temperature_dht_means.index, temperature_dht_means,
              label='Temperature - DHT11', marker='o', color='tomato')
 
-    plt.xlabel('Time')
-    plt.ylabel('Value')
-    plt.title('Temperature and Temperature DHT11 Data Together')
+    plt.xlabel('Time', fontsize=20)
+    plt.ylabel('Value', fontsize=20)
+    plt.title('Temperature and Temperature DHT11 Data Together', fontsize=20)
     plt.grid(True)
     plt.legend()
+    setLabelSize(20)
+    setTicksSize(14)
     plt.tight_layout()
 
     # Saving the plot as a photo
@@ -108,11 +122,13 @@ def saveHumidityAndDHTHumidityTogether():
     plt.plot(humidity_dht_means.index, humidity_dht_means,
              label='Humidity - DHT11', marker='o', color='lightblue')
 
-    plt.xlabel('Time')
-    plt.ylabel('Value')
-    plt.title('Humidity and Humidity DHT11 Data Together')
+    plt.xlabel('Time', fontsize=20)
+    plt.ylabel('Value', fontsize=20)
+    plt.title('Humidity and Humidity DHT11 Data Together', fontsize=20)
     plt.grid(True)
     plt.legend()
+    setLabelSize(20)
+    setTicksSize(14)
     plt.tight_layout()
 
     # Saving the plot as a photo
@@ -137,11 +153,13 @@ def saveSCD40AndDHTTogetherWithOutMeanSampling():
     # plt.plot(data.index, data['field4'],
     #          label='co2_means', marker='o', color='grey')
 
-    plt.xlabel('Time')
-    plt.ylabel('Value')
-    plt.title('SCD40 and DHT11 Data With Out Mean Sampling')
+    plt.xlabel('Time', fontsize=20)
+    plt.ylabel('Value', fontsize=20)
+    plt.title('SCD40 and DHT11 Data With Out Mean Sampling', fontsize=20)
     plt.grid(True)
     plt.legend()
+    setLabelSize(20)
+    setTicksSize(14)
     plt.tight_layout()
     # plt.show()
     plt.savefig(
