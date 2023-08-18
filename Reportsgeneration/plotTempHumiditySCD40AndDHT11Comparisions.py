@@ -9,7 +9,6 @@ print(current_directory)
 # Reading the CSV file
 
 data = pd.read_csv(
-    f'{current_directory}/sensordata.csv')
 
 data['field1'] = pd.to_datetime(data['field1'], format='%Y-%m-%dT%H:%M:%S%z')
 data.set_index('field1', inplace=True)
@@ -75,7 +74,6 @@ def saveSCD40AndDHTTogether():
     plt.grid(True)
     plt.legend()
     setLabelSize(20)
-    setTicksSize(14)
     plt.tight_layout()
     # plt.show()
 

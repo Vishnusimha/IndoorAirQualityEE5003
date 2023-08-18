@@ -108,7 +108,8 @@ def saveAllTogether():
 
     plt.xlabel('Time', fontsize=20)
     plt.ylabel('Value', fontsize=20)
-    plt.title('CO2, Temperature, and Humidity Data Trends with Ventilation Marks', fontsize=20)
+    plt.title(
+        'CO2, Temperature, and Humidity Data Trends with Ventilation Marks', fontsize=20)
     plt.grid(True)
     plt.legend()
     setLabelSize(20)
