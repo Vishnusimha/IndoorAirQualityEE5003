@@ -16,9 +16,31 @@ data['field1'] = pd.to_datetime(data['field1'])
 data.set_index('field1', inplace=True)
 
 # Resampling data to get mean values for each minute for temperature, humidity, and CO2
-hourly_temperature_means = data['field2'].resample('T').mean()
-hourly_humidity_means = data['field3'].resample('T').mean()
-hourly_co2_means = data['field4'].resample('T').mean()
+# hourly_temperature_means = data['field2'].resample('T').mean()
+# hourly_humidity_means = data['field3'].resample('T').mean()
+# hourly_co2_means = data['field4'].resample('T').mean()
+
+# hourly_temperature_means = data['field2'].resample('2T').mean()
+# hourly_humidity_means = data['field3'].resample('2T').mean()
+# hourly_co2_means = data['field4'].resample('2T').mean()
+
+# hourly_temperature_means = data['field2'].resample('3T').mean()
+# hourly_humidity_means = data['field3'].resample('3T').mean()
+# hourly_co2_means = data['field4'].resample('3T').mean()
+
+hourly_temperature_means = data['field2']
+hourly_humidity_means = data['field3']
+hourly_co2_means = data['field4']
+
+
+def setLabelSize(size):
+    for label in plt.legend().get_texts():
+        label.set_fontsize(size)
+
+
+def setTicksSize(size):
+    plt.xticks(fontsize=size)
+    plt.yticks(fontsize=size)
 
 
 def saveCO2andTemperatureHumiditySeparately():
@@ -32,11 +54,13 @@ def saveCO2andTemperatureHumiditySeparately():
     plt.plot(hourly_humidity_means.index, hourly_humidity_means,
              label='Humidity', marker='o', color='royalblue')
     addVentilationMarkers(plt, data)
-    plt.xlabel('Time')
-    plt.ylabel('Value')
-    plt.title('Temperature and Humidity Data')
+    plt.xlabel('Time', fontsize=20)
+    plt.ylabel('Value', fontsize=20)
+    plt.title('Temperature and Humidity Data', fontsize=20)
     plt.grid(True)
     plt.legend()
+    setLabelSize(20)
+    setTicksSize(14)
     plt.tight_layout()
 
     # Saving the plot as a photo
@@ -51,11 +75,14 @@ def saveCO2andTemperatureHumiditySeparately():
     plt.plot(hourly_co2_means.index, hourly_co2_means,
              label='CO2', marker='o', color='orangered')
     addVentilationMarkers(plt, data)
-    plt.xlabel('Time')
-    plt.ylabel('CO2')
-    plt.title('CO2 Data')
+
+    plt.xlabel('Time', fontsize=20)
+    plt.ylabel('CO2 Values', fontsize=20)
+    plt.title('CO2 Trends', fontsize=20)
     plt.grid(True)
     plt.legend()
+    setLabelSize(20)
+    setTicksSize(14)
     plt.tight_layout()
 
   # Saving the plot as a photo
@@ -79,11 +106,14 @@ def saveAllTogether():
 
     addVentilationMarkers(plt, data)
 
-    plt.xlabel('Time')
-    plt.ylabel('Value')
-    plt.title('24 Hours Data')
+    plt.xlabel('Time', fontsize=20)
+    plt.ylabel('Value', fontsize=20)
+    plt.title(
+        'CO2, Temperature, and Humidity Data Trends with Ventilation Marks', fontsize=20)
     plt.grid(True)
     plt.legend()
+    setLabelSize(20)
+    setTicksSize(16)
     plt.tight_layout()
 
     # Saving the plot as a photo
@@ -92,6 +122,7 @@ def saveAllTogether():
     plt.close()
 
 # Fn to create a new folder for storing plots
+
 
 def create_folder(base_folder_name):
     folder_name = f"{base_folder_name}_{getCurrentTime()}"
@@ -114,7 +145,20 @@ def addVentilationMarkers(axes, data):
 
 
 def count_true_values_in_csv():
-    true_count = data['field7'].sum()
+    true_count = 0
+    current_streak = 0
+
+    for value in data['field7']:
+        if value:
+            current_streak += 1
+        else:
+            if current_streak > 0:
+                true_count += 1
+                current_streak = 0
+
+    if current_streak > 0:
+        true_count += 1
+
     return true_count
 
 
@@ -123,4 +167,5 @@ if __name__ == "__main__":
         f"{current_directory}/24hrsDataPlots")
     saveCO2andTemperatureHumiditySeparately()
     saveAllTogether()
-    print(f"No of times ventilation is required: {count_true_values_in_csv()}")
+    print(
+        f"Number of times ventilation was required: {count_true_values_in_csv()}")

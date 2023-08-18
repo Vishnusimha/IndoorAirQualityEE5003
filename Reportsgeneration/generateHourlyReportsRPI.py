@@ -2,7 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import time
 import os
-# Raspberry code to generate hourly reports 
+# Raspberry code to generate hourly reports
 # Reading the CSV file
 current_directory = os.path.dirname(os.path.abspath(__file__))
 

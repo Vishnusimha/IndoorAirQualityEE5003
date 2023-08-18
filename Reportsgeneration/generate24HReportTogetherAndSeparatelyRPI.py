@@ -21,6 +21,16 @@ hourly_humidity_means = data['field3'].resample('T').mean()
 hourly_co2_means = data['field4'].resample('T').mean()
 
 
+def setLabelSize(size):
+    for label in plt.legend().get_texts():
+        label.set_fontsize(size)
+
+
+def setTicksSize(size):
+    plt.xticks(fontsize=size)
+    plt.yticks(fontsize=size)
+
+
 def saveCO2andTemperatureHumiditySeparately():
     # Plotting temperature and humidity
     plt.figure(figsize=(15, 8))
@@ -32,11 +42,13 @@ def saveCO2andTemperatureHumiditySeparately():
     plt.plot(hourly_humidity_means.index, hourly_humidity_means,
              label='Humidity', marker='o', color='royalblue')
 
-    plt.xlabel('Time')
-    plt.ylabel('Value')
-    plt.title('Temperature and Humidity Data')
+    plt.xlabel('Time', fontsize=20)
+    plt.ylabel('Value', fontsize=20)
+    plt.title('Temperature and Humidity Data', fontsize=20)
     plt.grid(True)
     plt.legend()
+    setLabelSize(20)
+    setTicksSize(14)
     plt.tight_layout()
 
     # Saving the plot as a photo
@@ -51,11 +63,13 @@ def saveCO2andTemperatureHumiditySeparately():
     plt.plot(hourly_co2_means.index, hourly_co2_means,
              label='CO2', marker='o', color='orangered')
 
-    plt.xlabel('Time')
-    plt.ylabel('CO2')
-    plt.title('CO2 Data')
+    plt.xlabel('Time', fontsize=20)
+    plt.ylabel('CO2 Value', fontsize=20)
+    plt.title('CO2 Trends', fontsize=20)
     plt.grid(True)
     plt.legend()
+    setLabelSize(20)
+    setTicksSize(18)
     plt.tight_layout()
 
   # Saving the plot as a photo
@@ -77,11 +91,13 @@ def saveAllTogether():
     plt.plot(hourly_co2_means.index, hourly_co2_means,
              label='CO2', marker='o', color='red')
 
-    plt.xlabel('Time')
-    plt.ylabel('Value')
-    plt.title('24 Hours Data')
+    plt.xlabel('Time', fontsize=20)
+    plt.ylabel('Value', fontsize=20)
+    plt.title('CO2, Temperature, and Humidity Data Trends', fontsize=20)
     plt.grid(True)
     plt.legend()
+    setLabelSize(20)
+    setTicksSize(18)
     plt.tight_layout()
 
     # Saving the plot as a photo
