@@ -1,0 +1,19 @@
+{
+    "logs": [
+        {
+            "outputFile": "com.vishnu.airqualitymonitor.test.app-mergeDebugAndroidTestResources-32:/values-v16/values-v16.xml",
+            "map": [
+                {
+                    "source": "/Users/vishnusimhadussa/.gradle/caches/transforms-3/f2c80716406e01669d9e9bfc4a7f9189/transformed/core-1.10.1/res/values-v16/values-v16.xml",
+                    "from": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endColumns": "65",
+                        "endOffsets": "116"
+                    }
+                }
+            ]
+        }
+    ]
+}
