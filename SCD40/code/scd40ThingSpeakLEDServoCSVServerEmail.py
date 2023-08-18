@@ -18,13 +18,14 @@ GPIO.setwarnings(False)
 servo_pin = 22
 pwm_frequency = 50
 led_pin = 27
+
 # configurable values
 temperatureThresholdForEmail = 22
 co2ThresholdForEmail = 1000
+humidityLowerThresholdForEmail = 40
 
 temperatureThresholdForVentilation = 25
 co2ThresholdForVentilation = 1000
-humidityThresholdForVentilation = 70
 
 # ThingSpeak endpoint and API KEY
 API_ENDPOINT = "https://api.thingspeak.com/update"
@@ -63,7 +64,7 @@ def create_csv_file():
     with open(CSV_FILE_PATH, 'w', newline='') as csvfile:
         writer = csv.writer(csvfile)
         writer.writerow(["created_at", "entry_id", "field1",
-                        "field2", "field3", "field4","field7"])
+                        "field2", "field3", "field4", "field7"])
 
 
 def get_next_entry_id():
@@ -222,19 +223,19 @@ def main():
                 print("Got readings")
                 print()
                 isVentilationRequired = False
-                if scd4x.temperature > temperatureThresholdForVentilation or scd4x.relative_humidity > humidityThresholdForVentilation or scd4x.CO2 > co2ThresholdForVentilation:
+                if scd4x.temperature > temperatureThresholdForVentilation or scd4x.CO2 > co2ThresholdForVentilation:
                     blink_led(num_times=2, delay=0.7)
                     print("Ventilating...")
                     isVentilationRequired = True
-                    # set_servo_angle(90)
+                    set_servo_angle(90)
                 else:
-                    # set_servo_angle(0)
+                    set_servo_angle(0)
                     print()
                 save_data_to_csv(current_time, scd4x.temperature,
                                  scd4x.relative_humidity, scd4x.CO2, isVentilationRequired)
                 sendDataToCloud(scd4x.CO2, scd4x.temperature,
                                 scd4x.relative_humidity, current_time, isVentilationRequired)
-                if scd4x.temperature > temperatureThresholdForEmail or scd4x.CO2 > co2ThresholdForEmail:
+                if scd4x.temperature > temperatureThresholdForEmail or scd4x.CO2 > co2ThresholdForEmail or scd4x.relative_humidity < humidityLowerThresholdForEmail:
                     sendEmailAlert(current_time, scd4x.CO2,
                                    scd4x.temperature, scd4x.relative_humidity)
 

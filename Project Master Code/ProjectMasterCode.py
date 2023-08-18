@@ -20,13 +20,14 @@ GPIO.setwarnings(False)
 servo_pin = 22
 pwm_frequency = 50
 led_pin = 27
+
 # configurable values
 temperatureThresholdForEmail = 22
 co2ThresholdForEmail = 1000
+humidityLowerThresholdForEmail = 40
 
 temperatureThresholdForVentilation = 25
 co2ThresholdForVentilation = 1000
-humidityThresholdForVentilation = 70
 
 # ThingSpeak endpoint and API KEY
 API_ENDPOINT = "https://api.thingspeak.com/update"
@@ -65,7 +66,7 @@ def create_csv_file():
     with open(CSV_FILE_PATH, 'w', newline='') as csvfile:
         writer = csv.writer(csvfile)
         writer.writerow(["created_at", "entry_id", "field1",
-                        "field2", "field3", "field4"])
+                        "field2", "field3", "field4", "field7"])
 
 
 def get_next_entry_id():
@@ -81,7 +82,7 @@ def get_next_entry_id():
             return 1
 
 
-def save_data_to_csv(created_at, temperature, humidity, co2):
+def save_data_to_csv(created_at, temperature, humidity, co2, isVentilationRequired):
     # Function to save data into  a CSV file
     entry_id = get_next_entry_id()
     with open(CSV_FILE_PATH, 'a', newline='') as csvfile:
@@ -89,25 +90,26 @@ def save_data_to_csv(created_at, temperature, humidity, co2):
         # Add column headings if the file is empty
         if csvfile.tell() == 0:
             writer.writerow(["created_at", "entry_id",
-                            "field1", "field2", "field3", "field4"])
+                            "field1", "field2", "field3", "field4", "field7"])
         writer.writerow([created_at, entry_id, created_at,
-                        temperature, humidity, co2])
+                        temperature, humidity, co2, isVentilationRequired])
 
 
-def sendDataToCloud(CO2, temperature, humidity, current_time):
+def sendDataToCloud(CO2, temperature, humidity, current_time, isVentilationRequired):
     print(f"Current time: {current_time}")
     print(f"CO2: {CO2} ppm")
     print(f"Temperature: {temperature:.1f} °C")
     print(f"Humidity: {humidity:.1f} %")
+    print(f"isVentilationRequired: {isVentilationRequired}")
     print()
-
     # Creating payload with data and API key
     payload = {
         "api_key": API_KEY,
         "field1": current_time,
         "field2": temperature,
         "field3": humidity,
-        "field4": CO2
+        "field4": CO2,
+        "field7": isVentilationRequired
     }
 
     # Sending HTTP POST type request to ThingSpeak
@@ -139,47 +141,44 @@ if not os.path.exists(CSV_FILE_PATH):
 
 class CSVHandler(http.server.SimpleHTTPRequestHandler):
     def do_GET(self):
-        # Get the request path
+        # Geting the request path (endpoint)
         path = self.path
 
         if path == '/csv':
-            # If the request is for CSV data, handle it accordingly
+            # if requested is for CSV data
             self.send_response(200)
             self.send_header('Content-type', 'text/csv')
             self.end_headers()
 
-            # Specify the CSV file name located in the current directory
             csv_filename = "/home/vishnu/Downloads/IndoorAirQualityEE5003/Reportsgeneration/sensordata.csv"
-
-            # Read the CSV data from the file
+            # Reading CSV data
             with open(csv_filename, 'r') as file:
                 csv_data = file.read()
 
             self.wfile.write(bytes(csv_data, 'utf-8'))
 
         elif path == '/json':
-            # If the request is for JSON data, handle it accordingly
+            # If requested is for JSON data
             self.send_response(200)
             self.send_header('Content-type', 'application/json')
             self.end_headers()
 
-            # Specify the CSV file name located in the current directory
             csv_filename = "/home/vishnu/Downloads/IndoorAirQualityEE5003/Reportsgeneration/sensordata.csv"
 
-            # Read the CSV data from the file and convert it to a list of dictionaries
+            # Reading CSV data and converting it to a list of dictionaries
             csv_data = []
             with open(csv_filename, 'r') as file:
                 csv_reader = csv.DictReader(file)
                 for row in csv_reader:
                     csv_data.append(row)
 
-            # Convert the list of dictionaries to a JSON object
+            # Converting list of dictionaries to a JSON object
             json_data = json.dumps(csv_data)
 
             self.wfile.write(bytes(json_data, 'utf-8'))
 
         else:
-            # If the request path is not recognized, return a 404 error
+            # when the request path is not in options, returning 404 error
             self.send_response(404)
             self.end_headers()
             self.wfile.write(b'Error 404: Not Found. Request /csv or /json')
@@ -225,18 +224,20 @@ def main():
                 current_time = time.strftime("%Y-%m-%dT%H:%M:%S%z", t)
                 print("Got readings")
                 print()
-                save_data_to_csv(current_time, scd4x.temperature,
-                                 scd4x.relative_humidity, scd4x.CO2)
-                sendDataToCloud(scd4x.CO2, scd4x.temperature,
-                                scd4x.relative_humidity, current_time)
-                if scd4x.temperature > temperatureThresholdForVentilation or scd4x.relative_humidity > humidityThresholdForVentilation or scd4x.CO2 > co2ThresholdForVentilation:
+                isVentilationRequired = False
+                if scd4x.temperature > temperatureThresholdForVentilation or scd4x.CO2 > co2ThresholdForVentilation:
                     blink_led(num_times=2, delay=0.7)
                     print("Ventilating...")
+                    isVentilationRequired = True
                     set_servo_angle(90)
                 else:
                     set_servo_angle(0)
-
-                if scd4x.temperature > temperatureThresholdForEmail or scd4x.CO2 > co2ThresholdForEmail:
+                    print()
+                save_data_to_csv(current_time, scd4x.temperature,
+                                 scd4x.relative_humidity, scd4x.CO2, isVentilationRequired)
+                sendDataToCloud(scd4x.CO2, scd4x.temperature,
+                                scd4x.relative_humidity, current_time, isVentilationRequired)
+                if scd4x.temperature > temperatureThresholdForEmail or scd4x.CO2 > co2ThresholdForEmail or scd4x.relative_humidity < humidityLowerThresholdForEmail:
                     sendEmailAlert(current_time, scd4x.CO2,
                                    scd4x.temperature, scd4x.relative_humidity)
 
@@ -249,9 +250,9 @@ def main():
 
 
 if __name__ == "__main__":
-    # Create and start the server thread
+    # Created and starting server thread
     server_thread = threading.Thread(target=start_server)
-    # Setting the thread as daemon allows it to exit when the main thread exits
+    # Setting the thread as daemon this allows it to exit when the main thread exits
     server_thread.daemon = True
-    server_thread.start()
+    server_thread.start()  # Starting Thread
     main()
