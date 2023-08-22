@@ -1,3 +1,5 @@
 
 ThingspeakAnalysis/.DS_Store
 .DS_Store
+*.bin
+*.lock

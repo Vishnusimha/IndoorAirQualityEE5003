@@ -109,6 +109,18 @@ fun Scd40Screen(viewModel: Scd40ViewModel) {
                         field6 = "null",
                         field7 = jsonObject.getString("field7"),
                     )
+                }else{
+                    sensorData = SensorData(
+                        createdAt = jsonObject.getString("created_at"),
+                        entryId = jsonObject.getString("entry_id"),
+                        field1 = jsonObject.getString("field1"),
+                        field2 = jsonObject.getString("field2"),
+                        field3 = jsonObject.getString("field3"),
+                        field4 = jsonObject.getString("field4"),
+                        field5 = "null",
+                        field6 = "null",
+                        field7 = "null",
+                    )
                 }
                 sensorDataList.add(sensorData)
             }

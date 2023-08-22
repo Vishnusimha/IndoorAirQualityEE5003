@@ -7,7 +7,7 @@ data class SensorData(
     val field2: String,
     val field3: String,
     val field4: String,
-    val field5: String?,
-    val field6: String?,
+    val field5: String="null",
+    val field6: String="null",
     val field7: String?
 )
