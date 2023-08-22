@@ -4,23 +4,23 @@
 
 ### Problem Statement
 
-In recent years, energy-efficient homes have become more airtight, leading to decreased ventilation and potential health concerns.
-We don’t know at what time CO2 levels are high 
-Everyone cannot operate windows/ventilators often to allow fresh air
-No access to data all the time with and without internet
+- In recent years, energy-efficient homes have become more airtight, leading to decreased ventilation and potential health concerns.
+- We don’t know at what time CO2 levels are high 
+- Everyone cannot operate windows/ventilators often to allow fresh air
+- No access to data all the time with and without internet
 
 ### Main Objective of Project
 
-Implement an air quality and temperature monitoring system using Raspberry Pi and an Adafruit SCD40 Sensor (CO2, humidity, and temperature).
-Automate responsive actions such as vent control using a servo motor to optimise the indoor environment.
-Provide timely alerts to notify individuals of any potential air quality issues. 
-Automate generation of air quality reports in Raspberry Pi (Provided results like how often it's required to allow fresh air or operate ventilation)
+- Implement an air quality and temperature monitoring system using Raspberry Pi and an Adafruit SCD40 Sensor (CO2, humidity, and temperature).
+- Automate responsive actions such as vent control using a servo motor to optimise the indoor environment.
+- Provide timely alerts to notify individuals of any potential air quality issues.
+- Automate generation of air quality reports in Raspberry Pi (Provided results like how often it's required to allow fresh air or operate ventilation)
 
 ### Added Objectives while development
 
-To add server functionality to the Raspberry Pi and expose APIs to get the data in different formats (JSON, CSV)
-To develop a reliable Android mobile application that shows recent and historical data from ThingSpeak Cloud and Raspberry Sever to continuously provide users with sensor data information.
-To test the project with an additional DHT11 sensor to make a comparative analysis of the performance
+- To add server functionality to the Raspberry Pi and expose APIs to get the data in different formats (JSON, CSV)
+- To develop a reliable Android mobile application that shows recent and historical data from ThingSpeak Cloud and Raspberry Sever to continuously provide users with sensor data information.
+- To test the project with an additional DHT11 sensor to make a comparative analysis of the performance
 
 
 ## Information about git repository
