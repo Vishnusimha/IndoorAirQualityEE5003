@@ -16,12 +16,12 @@ import json
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
 
-# Constants
+# Constants and assigned GPIO pins for usage
 servo_pin = 22
 pwm_frequency = 50
 led_pin = 27
 
-# configurable values
+# configurable values (To define Threshold values for monitoring)
 temperatureThresholdForEmail = 22
 co2ThresholdForEmail = 1000
 humidityLowerThresholdForEmail = 40
@@ -40,7 +40,7 @@ servo_pwm = GPIO.PWM(servo_pin, pwm_frequency)
 # LED initialisation
 GPIO.setup(led_pin, GPIO.OUT)
 
-# SCD40 initialisation
+# SCD40 initialisation in I2C communication
 i2c = board.I2C()
 scd4x = adafruit_scd4x.SCD4X(i2c)
 print("SCD40 Sensor Serial no:", [hex(i) for i in scd4x.serial_number])
@@ -59,10 +59,10 @@ print(current_directory)
 # CSV file path
 CSV_FILE_PATH = f"{grandparent_directory}/Reportsgeneration/sensordata.csv"
 print(f"Data saving to Directory -> {CSV_FILE_PATH}")
-# creating a CSV file if it not exists in that path
 
 
 def create_csv_file():
+    # creating a CSV file if it not exists in that path
     with open(CSV_FILE_PATH, 'w', newline='') as csvfile:
         writer = csv.writer(csvfile)
         writer.writerow(["created_at", "entry_id", "field1",
@@ -185,7 +185,8 @@ class CSVHandler(http.server.SimpleHTTPRequestHandler):
 
 
 def start_server():
-    address = ('192.168.1.43', 8000)
+    # To start server in below address and port number
+    address = ('192.168.1.43', 8000)  # Address of Raspberry Pi
     server = socketserver.TCPServer(address, CSVHandler)
 
     print(f'Server running on http://{address[0]}:{address[1]}/')
@@ -193,7 +194,7 @@ def start_server():
 
 
 def sendEmailAlert(current_time, CO2, temperature, humidity):
-    emailAlertKey = "TAKCvpzE5nuYVf+1Z3b"
+    emailAlertKey = "TAKCvpzE5nuYVf+1Z3b"  # Alert Key from ThingSpeak
     subject = "Indoor Monitoring Alert"
     body = f"Current time: {current_time}\n CO2: {scd4x.CO2} ppm \n Temperature: {scd4x.temperature:.1f} °C \n Humidity: {scd4x.relative_humidity:.1f} %"
     url = "https://api.thingspeak.com/alerts/send"
@@ -219,12 +220,14 @@ def main():
         # Start the PWM signal with 0 (servo at 0 degrees)
         servo_pwm.start(0)
         while True:
+            # Whole condition runs when the data is ready from SCD40 Sensor
             if scd4x.data_ready:
                 t = time.localtime()
                 current_time = time.strftime("%Y-%m-%dT%H:%M:%S%z", t)
                 print("Got readings")
                 print()
                 isVentilationRequired = False
+                # Condition check to ventilate the room
                 if scd4x.temperature > temperatureThresholdForVentilation or scd4x.CO2 > co2ThresholdForVentilation:
                     blink_led(num_times=2, delay=0.7)
                     print("Ventilating...")
@@ -233,10 +236,12 @@ def main():
                 else:
                     set_servo_angle(0)
                     print()
+                # Sending data to local storage and ThingSpeak cloud
                 save_data_to_csv(current_time, scd4x.temperature,
                                  scd4x.relative_humidity, scd4x.CO2, isVentilationRequired)
                 sendDataToCloud(scd4x.CO2, scd4x.temperature,
                                 scd4x.relative_humidity, current_time, isVentilationRequired)
+                # Condition check to send an email alert
                 if scd4x.temperature > temperatureThresholdForEmail or scd4x.CO2 > co2ThresholdForEmail or scd4x.relative_humidity < humidityLowerThresholdForEmail:
                     sendEmailAlert(current_time, scd4x.CO2,
                                    scd4x.temperature, scd4x.relative_humidity)

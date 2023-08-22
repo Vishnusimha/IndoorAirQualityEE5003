@@ -2,7 +2,9 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import time
 import os
-# Raspberry code to generate hourly reports
+
+# code to generate hourly reports. Use this code while running in Raspberry Reportsgeneration/generateHourlyReportsRPI.py
+
 # Reading the CSV file
 current_directory = os.path.dirname(os.path.abspath(__file__))
 
@@ -39,10 +41,13 @@ def plotEachHourDataAndSavePlots():
         hourly_humidity_means = humidity_hourly_data.resample('T').mean()
         hourly_co2_means = co2_hourly_data.resample('T').mean()
 
-    #    # Resampling data to get mean values for each minute for temperature, humidity, and CO2
-    #     hourly_temperature_means = temperature_hourly_data.resample('15T').mean()
-    #     hourly_humidity_means = humidity_hourly_data.resample('15T').mean()
-    #     hourly_co2_means = co2_hourly_data.resample('15T').mean()
+# Resampling data to get mean values for each minute for temperature, humidity, and CO2
+# We can also sample the data for 2 minutes and more like below.
+# It helps when we have huge data, so we can plot by sampling the values
+
+        # hourly_temperature_means = temperature_hourly_data.resample('15T').mean()
+        # hourly_humidity_means = humidity_hourly_data.resample('15T').mean()
+        # hourly_co2_means = co2_hourly_data.resample('15T').mean()
 
         # Ploting and saving the graphs for temperature, humidity, and CO2
         plt.figure(figsize=(12, 6))
@@ -84,6 +89,7 @@ def plotEachHourDataAndSavePlots():
 
 
 def create_folder(base_folder_name):
+    # To create a folder with time stamp for each time the code executes
     folder_name = f"{base_folder_name}_{getCurrentTime()}"
     if not os.path.exists(folder_name):
         os.makedirs(folder_name)
@@ -91,12 +97,14 @@ def create_folder(base_folder_name):
 
 
 def getCurrentTime():
+    # To get current time in a particular format
     t = time.localtime()
     current_time = time.strftime("%Y-%m-%dT%H:%M:%S%z", t)
     return current_time
 
 
 if __name__ == "__main__":
+    # Creating the folder at first and saving all files into it
     folder_name = create_folder(
         f"{current_directory}/HourlyDataPlots")
     plotEachHourDataAndSavePlots()

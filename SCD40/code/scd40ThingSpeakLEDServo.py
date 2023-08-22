@@ -7,7 +7,7 @@ import RPi.GPIO as GPIO
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
 
-# Servo motor
+# Assigning and Initialising Servo motor
 servo_pin = 22
 pwm_frequency = 50
 GPIO.setup(servo_pin, GPIO.OUT)

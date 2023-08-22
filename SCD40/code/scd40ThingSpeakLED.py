@@ -4,12 +4,15 @@ import adafruit_scd4x
 import requests
 import RPi.GPIO as GPIO
 
+# Initialising GPIO pins
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
 
+# Assigning and Initialising LED pin
 led_pin = 27
 GPIO.setup(led_pin, GPIO.OUT)
 
+# Initialising the I2C communication with Raspberry Pi
 i2c = board.I2C()
 scd4x = adafruit_scd4x.SCD4X(i2c)
 print("SCD40 Sensor Serial no:", [hex(i) for i in scd4x.serial_number])
@@ -20,6 +23,7 @@ print("Measuring CO2, Temperature and Humidity Values....")
 # ThingSpeak endpoint and API KEY
 API_ENDPOINT = "https://api.thingspeak.com/update"
 API_KEY = "9MB5PUUHD6AKTA8Z"
+
 
 def sendDataToCloud(CO2, temperature, humidity, current_time):
     print(CO2)
@@ -43,6 +47,7 @@ def sendDataToCloud(CO2, temperature, humidity, current_time):
     # Printing response status code
     print("Data sent to ThingSpeak Cloud. Status Code:", response.status_code)
 
+
 def blink_led(num_times, delay):
     print("LED blink intruction arrived")
     for _ in range(num_times):
@@ -57,9 +62,9 @@ while True:
         t = time.localtime()
         current_time = time.strftime("%H:%M:%S", t)
         print("current time %s " % current_time)
-        print("Temperature: %0.1f *C" % scd4x.temperature)
-        print("CO2: %d ppm" % scd4x.CO2)
-        print("Humidity: %0.1f %%" % scd4x.relative_humidity)
+        print(f"CO2: {scd4x.CO2} ppm")
+        print(f"Temperature: {scd4x.temperature:.1f} °C")
+        print(f"Humidity: {scd4x.relative_humidity:.1f} %")
         sendDataToCloud(scd4x.CO2, scd4x.temperature,
                         scd4x.relative_humidity, current_time)
         if scd4x.temperature > 23 or scd4x.relative_humidity > 70 or scd4x.CO2 > 900:

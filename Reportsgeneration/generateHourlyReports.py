@@ -3,6 +3,8 @@ import matplotlib.pyplot as plt
 import time
 import os
 
+# Raspberry code to generate hourly reports
+
 # Reading the CSV file
 data = pd.read_csv('IndoorAirQualityEE5003/Reportsgeneration/feeds.csv')
 
@@ -14,6 +16,7 @@ data['field1'] = pd.to_datetime(data['field1'])
 temperature_data = data[['field1', 'field2']]
 humidity_data = data[['field1', 'field3']]
 co2_data = data[['field1', 'field4']]
+
 
 def plotEachHourDataAndSavePlots():
 
@@ -36,7 +39,10 @@ def plotEachHourDataAndSavePlots():
         hourly_humidity_means = humidity_hourly_data.resample('T').mean()
         hourly_co2_means = co2_hourly_data.resample('T').mean()
 
-    #    # Resampling data to get mean values for each minute for temperature, humidity, and CO2
+# Resampling data to get mean values for each minute for temperature, humidity, and CO2
+# We can also sample the data for 2 minutes and more like below.
+# It helps when we have huge data, so we can plot by sampling the values
+
     #     hourly_temperature_means = temperature_hourly_data.resample('15T').mean()
     #     hourly_humidity_means = humidity_hourly_data.resample('15T').mean()
     #     hourly_co2_means = co2_hourly_data.resample('15T').mean()
@@ -79,18 +85,24 @@ def plotEachHourDataAndSavePlots():
         plt.close()
         # plt.show()
 
+
 def create_folder(base_folder_name):
+    # To create a folder with time stamp for each time the code executes
     folder_name = f"{base_folder_name}_{getCurrentTime()}"
     if not os.path.exists(folder_name):
         os.makedirs(folder_name)
     return folder_name
 
+
 def getCurrentTime():
+    # To get current time in a particular format
     t = time.localtime()
     current_time = time.strftime("%Y-%m-%dT%H:%M:%S%z", t)
     return current_time
 
+
 if __name__ == "__main__":
+    # Creating the folder at first and saving all files into it
     folder_name = create_folder(
         f"IndoorAirQualityEE5003/Reportsgeneration/HourlyDataPlots")
     plotEachHourDataAndSavePlots()

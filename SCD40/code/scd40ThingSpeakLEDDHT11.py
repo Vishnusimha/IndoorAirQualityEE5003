@@ -5,15 +5,18 @@ import requests
 import RPi.GPIO as GPIO
 import dht11
 
+# Initialising GPIO pins
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
 
+# Assigning and Initialising LED pin
 led_pin = 27
 GPIO.setup(led_pin, GPIO.OUT)
 
-# DHT 11
+# Assigning and Initialising DHT 11
 myDHT = dht11.DHT11(pin=17)
 
+# Initialising the I2C communication with Raspberry Pi
 i2c = board.I2C()
 scd4x = adafruit_scd4x.SCD4X(i2c)
 print("SCD40 Sensor Serial no:", [hex(i) for i in scd4x.serial_number])
@@ -67,9 +70,9 @@ while True:
         t = time.localtime()
         current_time = time.strftime("%H:%M:%S", t)
         print("current time %s " % current_time)
-        print("Temperature: %0.1f *C" % scd4x.temperature)
-        print("CO2: %d ppm" % scd4x.CO2)
-        print("Humidity: %0.1f %%" % scd4x.relative_humidity)
+        print(f"CO2: {scd4x.CO2} ppm")
+        print(f"Temperature: {scd4x.temperature:.1f} °C")
+        print(f"Humidity: {scd4x.relative_humidity:.1f} %")
         print()
         sendDataToCloud(scd4x.CO2, scd4x.temperature,
                         scd4x.relative_humidity, current_time)
