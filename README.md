@@ -30,7 +30,7 @@ The entire project code was implemented using different branches, and after each
 
 ### All Branches in the repository
 
-![List of all Branches in the repository](<Screenshot 2023-08-22 at 2.26.05 p.m..png>)
+![List of all Branches in the repository](<ReadMeFileData/Screenshot 2023-08-22 at 2.26.05 p.m..png>)
 
 ### [Project Board](https://github.com/users/VishnuSimhaDCU/projects/1/views/1)
 
@@ -42,10 +42,10 @@ The entire project code was implemented using different branches, and after each
 
 So each branch will have some additional features or changes right from starting. And all the changes can be seen in the main branch together.
 
-![Project Board View 1](<Screenshot 2023-08-22 at 2.29.04 p.m..png>)
+![Project Board View 1](<ReadMeFileData/Screenshot 2023-08-22 at 2.29.04 p.m..png>)
 **Another View**
 
-![Project Board Table View 3](<Screenshot 2023-08-22 at 2.29.35 p.m..png>)
+![Project Board Table View 3](<ReadMeFileData/Screenshot 2023-08-22 at 2.29.35 p.m..png>)
 
 ## Project Codes
 
@@ -74,3 +74,7 @@ Each feature was kept added to the previous code and the the final evolved code 
 [AirQualityMonitor Android Application](AirQualityMonitor) <- committed to a folder
 
 This was the Android application developed; this project needs to be opened with android studio, and then all the gradle files will get automatically synced and then we can build and run the project.
+
+<img src="ReadMeFileData/Screenshot_2023-08-18-23-30-50-562_com.vishnu.airqualitymonitor.jpg" style="max-width: 300px;">
+
+<img src="ReadMeFileData/Screenshot_2023-08-18-23-31-03-657_com.vishnu.airqualitymonitor.jpg" style="max-width: 300px;">
