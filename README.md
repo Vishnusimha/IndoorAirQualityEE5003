@@ -75,6 +75,6 @@ Each feature was kept added to the previous code and the the final evolved code 
 
 This was the Android application developed; this project needs to be opened with android studio, and then all the gradle files will get automatically synced and then we can build and run the project.
 
-<img src="ReadMeFileData/Screenshot_2023-08-18-23-30-50-562_com.vishnu.airqualitymonitor.jpg" style="max-width: 300px;">
+<img src="ReadMeFileData/Screenshot_2023-08-18-23-30-50-562_com.vishnu.airqualitymonitor.jpg" style="max-width: 200px;">
 
-<img src="ReadMeFileData/Screenshot_2023-08-18-23-31-03-657_com.vishnu.airqualitymonitor.jpg" style="max-width: 300px;">
+<img src="ReadMeFileData/Screenshot_2023-08-18-23-31-03-657_com.vishnu.airqualitymonitor.jpg" style="max-width: 200px;">
